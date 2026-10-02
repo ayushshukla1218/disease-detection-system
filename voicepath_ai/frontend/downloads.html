@@ -25,53 +25,65 @@
 </head>
 <body>
 
-<h1>📦 Dataset Downloads</h1>
-<p class="sub">Human voice datasets — 50 WAV files per disease (25 disease + 25 healthy)</p>
+<h1>📦 VoicePath AI — Downloads</h1>
+<p class="sub">Project files, feature extraction CSVs, and voice datasets</p>
 
+<div class="cards">
+
+  <!-- PROJECT ZIP -->
+  <div class="card" style="grid-column:1/-1;background:#0d2137;border-color:#2196F3">
+    <div class="icon">🗂</div>
+    <h2>Full Project Source Code</h2>
+    <div class="meta"><span>All Python backend + HTML/CSS/JS frontend · ~0.2 MB</span></div>
+    <a class="btn" href="/VoicePath_AI_Project.zip" download>⬇ Download Project ZIP</a>
+  </div>
+
+  <!-- COMBINED FEATURES -->
+  <div class="card" style="grid-column:1/-1;background:#0d2137;border-color:#00BCD4">
+    <div class="icon">📊</div>
+    <h2>All Diseases — Combined Feature CSV</h2>
+    <div class="meta"><span>238 samples · 46 columns (41 acoustic features + metadata) · All 5 diseases</span></div>
+    <a class="btn" href="/all_diseases_features.csv" download style="background:#00897B">⬇ Download Combined CSV</a>
+  </div>
+
+</div>
+
+<h2 style="margin:32px 0 16px;font-size:1.2rem;color:#8899aa">Per-Disease Feature Extraction CSVs</h2>
 <div class="cards">
 
   <div class="card">
     <div class="icon">🫁</div>
     <h2>Respiratory Disease</h2>
-    <div class="meta">
-      <span>50 WAV files · ~80 MB</span>
-      <span>22,050 Hz · Mono · 30–60s</span>
-    </div>
-    <button class="btn" onclick="downloadDataset('respiratory', this)">⬇ Download ZIP</button>
-    <div class="progress" id="prog-respiratory"></div>
+    <div class="meta"><span>50 samples · 41 features · disease + healthy labels</span></div>
+    <a class="btn" href="/respiratory_features.csv" download>⬇ Download CSV</a>
   </div>
 
   <div class="card">
     <div class="icon">🧠</div>
     <h2>Alzheimer's Disease</h2>
-    <div class="meta">
-      <span>50 WAV files · ~59 MB</span>
-      <span>22,050 Hz · Mono · 30–60s</span>
-    </div>
-    <button class="btn" onclick="downloadDataset('alzheimers', this)">⬇ Download ZIP</button>
-    <div class="progress" id="prog-alzheimers"></div>
+    <div class="meta"><span>50 samples · 41 features · disease + healthy labels</span></div>
+    <a class="btn" href="/alzheimers_features.csv" download>⬇ Download CSV</a>
   </div>
 
   <div class="card">
     <div class="icon">⚡</div>
     <h2>ALS (Motor Neuron)</h2>
-    <div class="meta">
-      <span>50 WAV files · ~69 MB</span>
-      <span>22,050 Hz · Mono · 30–60s</span>
-    </div>
-    <button class="btn" onclick="downloadDataset('als', this)">⬇ Download ZIP</button>
-    <div class="progress" id="prog-als"></div>
+    <div class="meta"><span>50 samples · 41 features · disease + healthy labels</span></div>
+    <a class="btn" href="/als_features.csv" download>⬇ Download CSV</a>
   </div>
 
   <div class="card">
     <div class="icon">💙</div>
     <h2>Depression</h2>
-    <div class="meta">
-      <span>50 WAV files · ~68 MB</span>
-      <span>22,050 Hz · Mono · 30–60s</span>
-    </div>
-    <button class="btn" onclick="downloadDataset('depression', this)">⬇ Download ZIP</button>
-    <div class="progress" id="prog-depression"></div>
+    <div class="meta"><span>50 samples · 41 features · disease + healthy labels</span></div>
+    <a class="btn" href="/depression_features.csv" download>⬇ Download CSV</a>
+  </div>
+
+  <div class="card">
+    <div class="icon">🤝</div>
+    <h2>Parkinson's Disease</h2>
+    <div class="meta"><span>38 samples · 41 features · MDVR-KCL real dataset</span></div>
+    <a class="btn" href="/parkinsons_features.csv" download>⬇ Download CSV</a>
   </div>
 
 </div>
@@ -79,51 +91,7 @@
 <a class="back" href="/">← Back to VoicePath AI</a>
 
 <script>
-async function downloadDataset(disease, btn) {
-  const prog = document.getElementById('prog-' + disease);
-  btn.disabled = true;
-  btn.textContent = 'Downloading...';
-  prog.textContent = 'Fetching file from server...';
-  try {
-    const res = await fetch('/' + disease + '_dataset.zip?t=' + Date.now(), { cache: 'no-store' });
-    if (!res.ok) throw new Error('Server error ' + res.status);
-    const ct = res.headers.get('Content-Type') || '';
-    if (ct.includes('text/html')) {
-      throw new Error('Got HTML instead of ZIP — try opening the page in Incognito mode');
-    }
-    const total = parseInt(res.headers.get('Content-Length') || '0');
-    const reader = res.body.getReader();
-    const chunks = [];
-    let received = 0;
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
-      received += value.length;
-      if (total) {
-        const pct = Math.round(received / total * 100);
-        prog.textContent = `${pct}% — ${(received/1024/1024).toFixed(1)} MB`;
-      } else {
-        prog.textContent = `${(received/1024/1024).toFixed(1)} MB received...`;
-      }
-    }
-    const blob = new Blob(chunks, { type: 'application/zip' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'VoicePath_' + disease + '_dataset.zip';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    prog.textContent = '✅ Download complete!';
-    btn.textContent = '✅ Downloaded';
-  } catch (e) {
-    prog.textContent = '❌ Error: ' + e.message;
-    btn.disabled = false;
-    btn.textContent = '⬇ Download ZIP';
-  }
-}
+// Direct anchor downloads — no JS needed
 </script>
 </body>
 </html>
