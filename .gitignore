@@ -6,10 +6,11 @@ voicepath_ai/backend/voicepath.db
 voicepath_ai/backend/uploads/
 voicepath_ai/backend/data/
 voicepath_ai/backend/static_downloads/
-voicepath_ai/backend/models/saved/*.pkl
+
 voicepath_ai/backend/results/*.csv
 disease_audio_dataset/
 uploads/
 *.log
 .DS_Store
 voicepath_ai/frontend/*.zip
+voicepath_ai/backend/results/*.csv

@@ -12,8 +12,10 @@ from auth import auth_bp
 
 app = Flask(__name__, static_folder='../frontend', static_url_path='')
 app.secret_key = 'voicepath-ai-secret-key-2024-change-in-production'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(
-    os.path.dirname(__file__), 'voicepath.db')
+# Use /tmp on Vercel serverless; local path otherwise
+_db_path = os.environ.get('DATABASE_URL') or \
+    'sqlite:///' + os.path.join(os.environ.get('VERCEL') and '/tmp' or os.path.dirname(__file__), 'voicepath.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = _db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['PERMANENT_SESSION_LIFETIME'] = 86400 * 7   # 7 days

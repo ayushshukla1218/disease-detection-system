@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "voicepath_ai/backend/app.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    },
+    {
+      "src": "voicepath_ai/frontend/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "voicepath_ai/backend/app.py"
+    },
+    {
+      "src": "/(css|js)/(.*)",
+      "dest": "voicepath_ai/frontend/$1/$2"
+    },
+    {
+      "src": "/(login\\.html|register\\.html|dashboard\\.html|downloads\\.html)",
+      "dest": "voicepath_ai/frontend/$1"
+    },
+    {
+      "src": "/",
+      "dest": "voicepath_ai/frontend/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "voicepath_ai/backend/app.py"
+    }
+  ]
+}
