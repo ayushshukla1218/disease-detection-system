@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account — VoicePath AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a1628; --bg-card: #0f1f3d; --primary: #2196F3; --secondary: #00BCD4;
+  --text: #e8edf5; --text-muted: #8a9bb5; --border: rgba(255,255,255,0.08);
+  --danger: #ef5350; --success: #66BB6A; --font: 'Inter', system-ui, sans-serif;
+}
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 32px 24px; }
+.brand { text-align: center; margin-bottom: 28px; }
+.brand h1 { font-size: 1.5rem; font-weight: 700; color: #fff; }
+.brand p { font-size: 0.8rem; color: var(--text-muted); margin-top: 3px; }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 36px; width: 100%; max-width: 500px; }
+/* Progress */
+.progress-bar { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 32px; }
+.step-dot { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.dot { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); background: transparent; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); transition: all 0.3s; }
+.dot.active { border-color: var(--primary); background: var(--primary); color: #fff; }
+.dot.done { border-color: var(--success); background: var(--success); color: #fff; }
+.step-label { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; }
+.step-label.active { color: var(--primary); }
+.connector { flex: 1; height: 2px; background: var(--border); max-width: 60px; margin-top: -14px; transition: background 0.3s; }
+.connector.done { background: var(--success); }
+/* Form */
+.step-panel { display: none; }
+.step-panel.active { display: block; }
+.step-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+.step-sub { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 24px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-group { margin-bottom: 16px; }
+label { display: block; font-size: 0.83rem; font-weight: 500; margin-bottom: 6px; color: #c8d8ef; }
+input[type=text], input[type=email], input[type=password], input[type=number], input[type=date], select, textarea {
+  width: 100%; background: rgba(255,255,255,0.05); border: 1.5px solid var(--border);
+  color: var(--text); border-radius: 8px; padding: 11px 14px; font-size: 0.92rem;
+  font-family: var(--font); outline: none; transition: border-color 0.2s;
+}
+select option { background: #0f1f3d; }
+textarea { resize: vertical; min-height: 70px; }
+input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+.toggle-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.toggle-btn { background: rgba(255,255,255,0.04); border: 1.5px solid var(--border); color: var(--text-muted); border-radius: 8px; padding: 10px; font-size: 0.85rem; font-weight: 500; cursor: pointer; font-family: var(--font); text-align: center; transition: all 0.2s; }
+.toggle-btn.selected-yes { border-color: var(--danger); background: rgba(239,83,80,0.1); color: #ef5350; }
+.toggle-btn.selected-no  { border-color: var(--success); background: rgba(76,175,80,0.1); color: var(--success); }
+.nav-btns { display: flex; gap: 12px; margin-top: 24px; }
+.btn { flex: 1; background: var(--primary); color: #fff; border: none; border-radius: 8px; padding: 13px; font-size: 0.95rem; font-weight: 600; cursor: pointer; font-family: var(--font); transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn:hover { background: #1976D2; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
+.btn-outline:hover { background: rgba(33,150,243,0.1); }
+.error-msg { background: rgba(239,83,80,0.1); border: 1px solid rgba(239,83,80,0.3); color: var(--danger); border-radius: 8px; padding: 12px; font-size: 0.85rem; margin-bottom: 18px; display: none; }
+.login-link { text-align: center; margin-top: 20px; font-size: 0.88rem; color: var(--text-muted); }
+.link { color: var(--primary); text-decoration: none; }
+.link:hover { text-decoration: underline; }
+.pw-strength { height: 4px; border-radius: 2px; margin-top: 6px; transition: all 0.3s; }
+.spinner { width: 16px; height: 16px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media(max-width:500px) { .form-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="brand">
+  <h1>VoicePath AI</h1>
+  <p>Create your patient account</p>
+</div>
+
+<div class="card">
+  <!-- Progress bar -->
+  <div class="progress-bar" id="progress-bar">
+    <div class="step-dot">
+      <div class="dot active" id="dot-1">1</div>
+      <div class="step-label active" id="lbl-1">Account</div>
+    </div>
+    <div class="connector" id="conn-1"></div>
+    <div class="step-dot">
+      <div class="dot" id="dot-2">2</div>
+      <div class="step-label" id="lbl-2">Personal</div>
+    </div>
+    <div class="connector" id="conn-2"></div>
+    <div class="step-dot">
+      <div class="dot" id="dot-3">3</div>
+      <div class="step-label" id="lbl-3">Medical</div>
+    </div>
+  </div>
+
+  <div class="error-msg" id="error-msg"></div>
+
+  <!-- STEP 1: Account -->
+  <div class="step-panel active" id="step-1">
+    <h3 class="step-title">Account Information</h3>
+    <p class="step-sub">Set up your login credentials</p>
+    <div class="form-group">
+      <label>Email Address *</label>
+      <input type="email" id="email" placeholder="your@email.com" required>
+    </div>
+    <div class="form-group">
+      <label>Username *</label>
+      <input type="text" id="username" placeholder="Choose a username (min 3 chars)" required>
+    </div>
+    <div class="form-group">
+      <label>Password *</label>
+      <input type="password" id="password" placeholder="Min 6 characters" oninput="checkPwStrength(this.value)" required>
+      <div class="pw-strength" id="pw-strength"></div>
+    </div>
+    <div class="form-group">
+      <label>Confirm Password *</label>
+      <input type="password" id="confirm-pw" placeholder="Re-enter password" required>
+    </div>
+    <div class="nav-btns">
+      <button class="btn" onclick="nextStep(1)">Next &#8594;</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Personal Info -->
+  <div class="step-panel" id="step-2">
+    <h3 class="step-title">Personal Information</h3>
+    <p class="step-sub">Help us personalize your dashboard</p>
+    <div class="form-group">
+      <label>Full Name *</label>
+      <input type="text" id="full-name" placeholder="Enter your full name" required>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Age</label>
+        <input type="number" id="age" placeholder="Years" min="1" max="120">
+      </div>
+      <div class="form-group">
+        <label>Gender</label>
+        <select id="gender">
+          <option value="">Select</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+          <option value="Prefer not to say">Prefer not to say</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date of Birth</label>
+        <input type="date" id="dob">
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="text" id="phone" placeholder="+1 234 567 8900">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Address</label>
+      <input type="text" id="address" placeholder="City, Country">
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-outline" onclick="prevStep(2)">&#8592; Back</button>
+      <button class="btn" onclick="nextStep(2)">Next &#8594;</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Medical History -->
+  <div class="step-panel" id="step-3">
+    <h3 class="step-title">Medical History</h3>
+    <p class="step-sub">This information helps provide better analysis context</p>
+
+    <div class="form-group">
+      <label>Do you have Diabetes?</label>
+      <div class="toggle-group">
+        <button type="button" class="toggle-btn" id="diab-yes" onclick="setToggle('diabetes', true)">Yes</button>
+        <button type="button" class="toggle-btn" id="diab-no"  onclick="setToggle('diabetes', false)">No</button>
+      </div>
+    </div>
+    <div class="form-group" id="diab-type-group" style="display:none">
+      <label>Diabetes Type</label>
+      <select id="diabetes-type">
+        <option value="">Select type</option>
+        <option value="Type 1">Type 1</option>
+        <option value="Type 2">Type 2</option>
+        <option value="Pre-diabetic">Pre-diabetic</option>
+        <option value="Gestational">Gestational</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Hypertension (High BP)?</label>
+        <div class="toggle-group">
+          <button type="button" class="toggle-btn" id="hyp-yes" onclick="setToggle('hypertension', true)">Yes</button>
+          <button type="button" class="toggle-btn" id="hyp-no"  onclick="setToggle('hypertension', false)">No</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Asthma?</label>
+        <div class="toggle-group">
+          <button type="button" class="toggle-btn" id="asthma-yes" onclick="setToggle('asthma', true)">Yes</button>
+          <button type="button" class="toggle-btn" id="asthma-no"  onclick="setToggle('asthma', false)">No</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Heart Disease?</label>
+        <div class="toggle-group">
+          <button type="button" class="toggle-btn" id="heart-yes" onclick="setToggle('heart', true)">Yes</button>
+          <button type="button" class="toggle-btn" id="heart-no"  onclick="setToggle('heart', false)">No</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Smoker?</label>
+        <div class="toggle-group">
+          <button type="button" class="toggle-btn" id="smoke-yes" onclick="setToggle('smoker', true)">Yes</button>
+          <button type="button" class="toggle-btn" id="smoke-no"  onclick="setToggle('smoker', false)">No</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Current Medications</label>
+      <textarea id="medications" placeholder="List any medications you currently take..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Known Allergies</label>
+      <input type="text" id="allergies" placeholder="e.g. Penicillin, Pollen">
+    </div>
+    <div class="form-group">
+      <label>Family Medical History</label>
+      <textarea id="family-history" placeholder="Any relevant family medical history..."></textarea>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn btn-outline" onclick="prevStep(3)">&#8592; Back</button>
+      <button class="btn" id="submit-btn" onclick="handleRegister()">
+        <span id="submit-text">Create Account</span>
+        <div class="spinner" id="submit-spinner" style="display:none"></div>
+      </button>
+    </div>
+  </div>
+
+  <div class="login-link">
+    Already have an account? <a href="login.html" class="link">Sign in</a>
+  </div>
+</div>
+
+<script>
+const toggleState = { diabetes: null, hypertension: null, asthma: null, heart: null, smoker: null };
+
+function setToggle(key, val) {
+  toggleState[key] = val;
+  const prefix = { diabetes:'diab', hypertension:'hyp', asthma:'asthma', heart:'heart', smoker:'smoke' }[key];
+  document.getElementById(prefix+'-yes').className = 'toggle-btn' + (val ? ' selected-yes' : '');
+  document.getElementById(prefix+'-no').className  = 'toggle-btn' + (!val ? ' selected-no' : '');
+  if (key === 'diabetes') document.getElementById('diab-type-group').style.display = val ? 'block' : 'none';
+}
+
+function checkPwStrength(pw) {
+  const el = document.getElementById('pw-strength');
+  if (!pw) { el.style.width='0'; return; }
+  let score = 0;
+  if (pw.length >= 6) score++;
+  if (pw.length >= 10) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const colors = ['#f44336','#FF9800','#FFC107','#66BB6A','#2196F3'];
+  el.style.background = colors[score-1] || '#ef5350';
+  el.style.width = (score * 20) + '%';
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg; el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function hideError() { document.getElementById('error-msg').style.display = 'none'; }
+
+function updateProgress(current) {
+  [1,2,3].forEach(i => {
+    const dot = document.getElementById('dot-'+i);
+    const lbl = document.getElementById('lbl-'+i);
+    if (i < current) { dot.className='dot done'; dot.textContent='✓'; lbl.className='step-label'; }
+    else if (i === current) { dot.className='dot active'; dot.textContent=i; lbl.className='step-label active'; }
+    else { dot.className='dot'; dot.textContent=i; lbl.className='step-label'; }
+  });
+  [1,2].forEach(i => {
+    document.getElementById('conn-'+i).className = 'connector' + (i < current ? ' done' : '');
+  });
+}
+
+function nextStep(current) {
+  hideError();
+  if (current === 1) {
+    const email = document.getElementById('email').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const pw = document.getElementById('password').value;
+    const cpw = document.getElementById('confirm-pw').value;
+    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { showError('Enter a valid email address.'); return; }
+    if (username.length < 3) { showError('Username must be at least 3 characters.'); return; }
+    if (pw.length < 6) { showError('Password must be at least 6 characters.'); return; }
+    if (pw !== cpw) { showError('Passwords do not match.'); return; }
+  }
+  if (current === 2) {
+    if (!document.getElementById('full-name').value.trim()) { showError('Full name is required.'); return; }
+  }
+  document.getElementById('step-'+current).classList.remove('active');
+  document.getElementById('step-'+(current+1)).classList.add('active');
+  updateProgress(current+1);
+}
+
+function prevStep(current) {
+  hideError();
+  document.getElementById('step-'+current).classList.remove('active');
+  document.getElementById('step-'+(current-1)).classList.add('active');
+  updateProgress(current-1);
+}
+
+async function handleRegister() {
+  hideError();
+  const btn = document.getElementById('submit-btn');
+  const spinner = document.getElementById('submit-spinner');
+  const btnText = document.getElementById('submit-text');
+  btn.disabled = true; spinner.style.display='block'; btnText.textContent='Creating account...';
+
+  const payload = {
+    email:           document.getElementById('email').value.trim(),
+    username:        document.getElementById('username').value.trim(),
+    password:        document.getElementById('password').value,
+    full_name:       document.getElementById('full-name').value.trim(),
+    age:             parseInt(document.getElementById('age').value) || null,
+    gender:          document.getElementById('gender').value,
+    date_of_birth:   document.getElementById('dob').value,
+    phone:           document.getElementById('phone').value.trim(),
+    address:         document.getElementById('address').value.trim(),
+    has_diabetes:    toggleState.diabetes === true,
+    diabetes_type:   document.getElementById('diabetes-type').value,
+    has_hypertension:toggleState.hypertension === true,
+    has_asthma:      toggleState.asthma === true,
+    has_heart_disease:toggleState.heart === true,
+    smoker:          toggleState.smoker === true,
+    current_medications: document.getElementById('medications').value.trim(),
+    allergies:       document.getElementById('allergies').value.trim(),
+    family_history:  document.getElementById('family-history').value.trim(),
+  };
+
+  try {
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) { showError(data.error || 'Registration failed'); return; }
+    localStorage.setItem('vp_user', JSON.stringify(data.user));
+    localStorage.setItem('vp_patient', JSON.stringify(data.patient));
+    window.location.href = '/dashboard.html';
+  } catch(err) {
+    showError('Network error: ' + err.message);
+  } finally {
+    btn.disabled = false; spinner.style.display='none'; btnText.textContent='Create Account';
+  }
+}
+</script>
+</body>
+</html>

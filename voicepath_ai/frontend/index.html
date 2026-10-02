@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoicePath AI — Voice-Based Disease Detection</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="container">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="20" fill="#2196F3" opacity="0.15"/>
+          <path d="M8 20 Q12 10 16 20 Q20 30 24 20 Q28 10 32 20" stroke="#2196F3" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <circle cx="20" cy="20" r="4" fill="#00BCD4"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="logo-title">VoicePath AI</h1>
+        <p class="logo-sub">Voice-Based Disease Detection System</p>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="#analyze" class="nav-link">Analyze</a>
+      <a href="#diseases" class="nav-link">Diseases</a>
+      <a href="#performance" class="nav-link">Performance</a>
+      <span class="badge badge-research">Research Prototype</span>
+      <a href="dashboard.html" class="nav-link" id="nav-dashboard" style="display:none">Dashboard</a>
+      <a href="login.html" class="btn-nav-login" id="nav-login">Sign In</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-tag">AI-Powered Voice Analysis</div>
+      <h2 class="hero-title">Detect Disease Patterns<br><span class="accent">Through Your Voice</span></h2>
+      <p class="hero-desc">Our machine learning system analyzes acoustic features of voice recordings — pitch, MFCCs, spectral characteristics, and more — to identify patterns associated with neurological and respiratory conditions.</p>
+      <div class="hero-stats" id="hero-stats">
+        <div class="stat"><span class="stat-num" id="stat-models">0</span><span class="stat-label">Models Trained</span></div>
+        <div class="stat"><span class="stat-num">5</span><span class="stat-label">Diseases</span></div>
+        <div class="stat"><span class="stat-num">41</span><span class="stat-label">Voice Features</span></div>
+        <div class="stat"><span class="stat-num">200+</span><span class="stat-label">Audio Samples</span></div>
+      </div>
+      <a href="#analyze" class="btn-primary">Start Analysis</a>
+    </div>
+    <div class="hero-visual">
+      <div class="waveform-visual">
+        <div class="wv-bars" id="wv-anim"></div>
+        <p class="wv-label">Voice waveform analysis</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DISEASE CARDS -->
+<section class="section" id="diseases">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Supported Disease Analyses</h2>
+      <p class="section-sub">Each disease affects voice characteristics differently. Our models learn these distinct patterns.</p>
+    </div>
+    <div class="disease-grid" id="disease-grid">
+      <!-- populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ANALYZE SECTION -->
+<section class="section section-dark" id="analyze">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Voice Analysis</h2>
+      <p class="section-sub">Upload a voice recording and select a disease to analyze. The AI will extract 41 acoustic features and classify the recording.</p>
+    </div>
+
+    <div class="analyze-grid">
+      <!-- Upload Panel -->
+      <div class="card">
+        <h3 class="card-title">1. Upload Voice Recording</h3>
+
+        <div class="upload-zone" id="upload-zone">
+          <div class="upload-icon">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="24" fill="#2196F3" opacity="0.1"/>
+              <path d="M24 14v14M18 20l6-6 6 6" stroke="#2196F3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M14 34h20" stroke="#2196F3" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p class="upload-text">Drag & drop audio file here</p>
+          <p class="upload-sub">WAV, MP3, OGG, FLAC supported</p>
+          <button class="btn-outline" onclick="document.getElementById('file-input').click()">Browse Files</button>
+          <input type="file" id="file-input" accept=".wav,.mp3,.ogg,.flac,.m4a" style="display:none">
+        </div>
+
+        <div class="file-info" id="file-info" style="display:none">
+          <div class="file-info-inner">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 19V6l12-3v13" stroke="#2196F3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="19" r="3" stroke="#2196F3" stroke-width="2"/><circle cx="18" cy="16" r="3" stroke="#2196F3" stroke-width="2"/></svg>
+            <div>
+              <p class="file-name" id="file-name">—</p>
+              <p class="file-size" id="file-size">—</p>
+            </div>
+            <button class="btn-icon" onclick="clearFile()" title="Remove">✕</button>
+          </div>
+          <audio id="audio-preview" controls style="width:100%;margin-top:10px"></audio>
+        </div>
+
+        <div class="record-section">
+          <p class="or-divider"><span>OR</span></p>
+          <button class="btn-record" id="record-btn" onclick="toggleRecord()">
+            <span class="rec-dot"></span> Record Voice
+          </button>
+          <p class="record-hint" id="record-hint">Click to start recording (microphone required)</p>
+        </div>
+      </div>
+
+      <!-- Settings + Results -->
+      <div>
+        <div class="card" style="margin-bottom:20px">
+          <h3 class="card-title">2. Select Disease</h3>
+          <select class="select-disease" id="disease-select">
+            <option value="">— Choose a disease —</option>
+            <option value="parkinsons">Parkinson's Disease</option>
+            <option value="respiratory">Respiratory Disease</option>
+            <option value="alzheimers">Alzheimer's Disease</option>
+            <option value="als">ALS (Motor Neuron Disease)</option>
+            <option value="depression">Depression</option>
+          </select>
+
+          <button class="btn-primary btn-analyze" id="analyze-btn" onclick="runAnalysis()">
+            <span id="analyze-btn-text">Analyze Voice</span>
+            <div class="spinner" id="spinner" style="display:none"></div>
+          </button>
+        </div>
+
+        <!-- Result Card -->
+        <div class="card result-card" id="result-card" style="display:none">
+          <div class="result-header">
+            <div class="result-icon" id="result-icon">?</div>
+            <div>
+              <h3 class="result-disease" id="result-disease-name">—</h3>
+              <p class="result-classification" id="result-label">—</p>
+            </div>
+          </div>
+
+          <div class="confidence-section">
+            <div class="confidence-label">
+              <span>Model Confidence</span>
+              <span id="conf-pct">—%</span>
+            </div>
+            <div class="confidence-bar-bg">
+              <div class="confidence-bar" id="conf-bar" style="width:0%"></div>
+            </div>
+            <p class="uncertain-note" id="uncertain-note" style="display:none">
+              ⚠ Low confidence — result may be unreliable
+            </p>
+          </div>
+
+          <div class="prob-section" id="prob-section">
+            <h4 class="subsection-title">Class Probabilities</h4>
+            <div id="prob-bars"></div>
+          </div>
+
+          <div class="features-section" id="features-section">
+            <h4 class="subsection-title">Key Voice Features Detected</h4>
+            <div class="features-grid" id="features-grid"></div>
+          </div>
+
+          <div class="disclaimer-box">
+            <p id="result-disclaimer"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PERFORMANCE SECTION -->
+<section class="section" id="performance">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Model Performance</h2>
+      <p class="section-sub">Evaluation results on held-out test subjects. Subject-wise splitting ensures recordings from the same person do not appear in both training and testing.</p>
+    </div>
+    <div class="perf-table-wrap">
+      <table class="perf-table" id="perf-table">
+        <thead>
+          <tr>
+            <th>Disease</th>
+            <th>Best Model</th>
+            <th>Accuracy</th>
+            <th>Precision</th>
+            <th>Recall / Sensitivity</th>
+            <th>Specificity</th>
+            <th>F1-Score</th>
+            <th>ROC-AUC</th>
+          </tr>
+        </thead>
+        <tbody id="perf-tbody">
+          <tr><td colspan="8" class="loading-cell">Loading model metrics...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- METHODOLOGY -->
+<section class="section section-dark">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">How It Works</h2>
+    </div>
+    <div class="method-steps">
+      <div class="method-step">
+        <div class="step-num">01</div>
+        <div class="step-icon">🎙</div>
+        <h3>Voice Recording</h3>
+        <p>Upload or record a voice sample (30–120 seconds recommended). Recordings are processed locally and not stored.</p>
+      </div>
+      <div class="method-step">
+        <div class="step-num">02</div>
+        <div class="step-icon">🔬</div>
+        <h3>Feature Extraction</h3>
+        <p>41 acoustic features extracted: pitch statistics, 13 MFCCs (mean+std), ZCR, RMS energy, spectral centroid, bandwidth, and rolloff.</p>
+      </div>
+      <div class="method-step">
+        <div class="step-num">03</div>
+        <div class="step-icon">🤖</div>
+        <h3>ML Classification</h3>
+        <p>Trained Random Forest, SVM, and Gradient Boosting models compare results. Best model by F1-score on held-out subjects is used.</p>
+      </div>
+      <div class="method-step">
+        <div class="step-num">04</div>
+        <div class="step-icon">📊</div>
+        <h3>Result + Confidence</h3>
+        <p>Classification result shown with probability confidence. Results with &lt;60% confidence are flagged as uncertain.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-logo">
+      <h3>VoicePath AI</h3>
+      <p>Disease Detection Using Voice Samples and AI/ML</p>
+    </div>
+    <div class="disclaimer-footer">
+      <strong>Medical Disclaimer:</strong> VoicePath AI is an experimental research prototype developed for academic and educational purposes. It is not intended to diagnose, treat, cure, or prevent any disease. Results should not be used as a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider.
+    </div>
+    <p class="footer-copy">© 2024 VoicePath AI Research Project · Final Year Project</p>
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+<script>
+// Auth gate: redirect to login if not signed in
+fetch('/api/auth/me', {credentials:'include'}).then(r => {
+  if (!r.ok) {
+    // Not logged in — redirect to login, preserve intended destination
+    window.location.href = '/login.html?next=' + encodeURIComponent(window.location.pathname);
+  } else {
+    document.getElementById('nav-dashboard').style.display = 'inline';
+    document.getElementById('nav-login').textContent = 'Dashboard';
+    document.getElementById('nav-login').href = '/dashboard.html';
+  }
+});
+</script>
+</body>
+</html>

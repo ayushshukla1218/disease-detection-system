@@ -1,0 +1,51 @@
+{
+  "disease": "als",
+  "best_model": "SVM",
+  "best_result": {
+    "accuracy": 0.857,
+    "precision": 0.8827,
+    "recall": 0.8381,
+    "specificity": 0.8703,
+    "f1": 0.8403,
+    "auc": 0.9206
+  },
+  "all_models": {
+    "RandomForest": {
+      "accuracy": 0.8355,
+      "precision": 0.8324,
+      "recall": 0.8219,
+      "specificity": 0.8581,
+      "f1": 0.836,
+      "auc": 0.8523
+    },
+    "SVM": {
+      "accuracy": 0.857,
+      "precision": 0.8827,
+      "recall": 0.8381,
+      "specificity": 0.8703,
+      "f1": 0.8403,
+      "auc": 0.9206
+    },
+    "LogisticRegression": {
+      "accuracy": 0.6844,
+      "precision": 0.6668,
+      "recall": 0.6332,
+      "specificity": 0.68,
+      "f1": 0.6704,
+      "auc": 0.6767
+    },
+    "GradientBoosting": {
+      "accuracy": 0.8332,
+      "precision": 0.8435,
+      "recall": 0.8028,
+      "specificity": 0.8538,
+      "f1": 0.8249,
+      "auc": 0.8437
+    }
+  },
+  "n_samples": 50,
+  "n_disease": 25,
+  "n_healthy": 25,
+  "top_features": {},
+  "cv_folds": 5
+}

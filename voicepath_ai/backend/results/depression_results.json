@@ -1,0 +1,62 @@
+{
+  "disease": "depression",
+  "best_model": "RandomForest",
+  "best_result": {
+    "accuracy": 0.8534,
+    "precision": 0.8519,
+    "recall": 0.8098,
+    "specificity": 0.8372,
+    "f1": 0.8206,
+    "auc": 0.863
+  },
+  "all_models": {
+    "RandomForest": {
+      "accuracy": 0.8534,
+      "precision": 0.8519,
+      "recall": 0.8098,
+      "specificity": 0.8372,
+      "f1": 0.8206,
+      "auc": 0.863
+    },
+    "SVM": {
+      "accuracy": 0.7846,
+      "precision": 0.7999,
+      "recall": 0.7629,
+      "specificity": 0.7868,
+      "f1": 0.7793,
+      "auc": 0.8183
+    },
+    "LogisticRegression": {
+      "accuracy": 0.6306,
+      "precision": 0.6838,
+      "recall": 0.6325,
+      "specificity": 0.6382,
+      "f1": 0.6294,
+      "auc": 0.6934
+    },
+    "GradientBoosting": {
+      "accuracy": 0.8065,
+      "precision": 0.8409,
+      "recall": 0.772,
+      "specificity": 0.8375,
+      "f1": 0.7919,
+      "auc": 0.8408
+    }
+  },
+  "n_samples": 50,
+  "n_disease": 25,
+  "n_healthy": 25,
+  "top_features": {
+    "pitch_median": 0.11,
+    "spectral_rolloff_mean": 0.0975,
+    "rms_std": 0.0901,
+    "pitch_p5": 0.07,
+    "mfcc_1_mean": 0.065,
+    "rms_mean": 0.0627,
+    "mfcc_3_std": 0.0611,
+    "mfcc_6_mean": 0.0611,
+    "spectral_bandwidth_mean": 0.06,
+    "mfcc_8_mean": 0.06
+  },
+  "cv_folds": 5
+}

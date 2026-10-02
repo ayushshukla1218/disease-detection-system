@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+voicepath.db
+uploads/
+data/
+static_downloads/
+models/saved/*.pkl
+results/*.csv
+*.log
+.DS_Store

@@ -1,0 +1,62 @@
+{
+  "disease": "alzheimers",
+  "best_model": "RandomForest",
+  "best_result": {
+    "accuracy": 0.8452,
+    "precision": 0.8786,
+    "recall": 0.8536,
+    "specificity": 0.8925,
+    "f1": 0.8901,
+    "auc": 0.8769
+  },
+  "all_models": {
+    "RandomForest": {
+      "accuracy": 0.8452,
+      "precision": 0.8786,
+      "recall": 0.8536,
+      "specificity": 0.8925,
+      "f1": 0.8901,
+      "auc": 0.8769
+    },
+    "SVM": {
+      "accuracy": 0.8064,
+      "precision": 0.8343,
+      "recall": 0.7939,
+      "specificity": 0.8505,
+      "f1": 0.8249,
+      "auc": 0.8269
+    },
+    "LogisticRegression": {
+      "accuracy": 0.6791,
+      "precision": 0.6907,
+      "recall": 0.6532,
+      "specificity": 0.7009,
+      "f1": 0.6824,
+      "auc": 0.7091
+    },
+    "GradientBoosting": {
+      "accuracy": 0.8452,
+      "precision": 0.8765,
+      "recall": 0.8163,
+      "specificity": 0.8391,
+      "f1": 0.8299,
+      "auc": 0.8782
+    }
+  },
+  "n_samples": 50,
+  "n_disease": 25,
+  "n_healthy": 25,
+  "top_features": {
+    "mfcc_10_std": 0.085,
+    "pitch_median": 0.075,
+    "spectral_rolloff_mean": 0.07,
+    "mfcc_8_std": 0.065,
+    "mfcc_8_mean": 0.065,
+    "pitch_p5": 0.065,
+    "mfcc_1_mean": 0.06,
+    "mfcc_3_std": 0.06,
+    "rms_mean": 0.0511,
+    "mfcc_6_mean": 0.0508
+  },
+  "cv_folds": 5
+}

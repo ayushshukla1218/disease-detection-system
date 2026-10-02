@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — VoicePath AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a1628; --bg-card: #0f1f3d; --primary: #2196F3;
+  --secondary: #00BCD4; --text: #e8edf5; --text-muted: #8a9bb5;
+  --border: rgba(255,255,255,0.08); --danger: #ef5350; --success: #66BB6A;
+  --font: 'Inter', system-ui, sans-serif;
+}
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+.brand { text-align: center; margin-bottom: 36px; }
+.brand-icon { width: 56px; height: 56px; background: rgba(33,150,243,0.12); border: 1px solid rgba(33,150,243,0.25); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+.brand h1 { font-size: 1.7rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.brand p { font-size: 0.82rem; color: var(--text-muted); }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 36px; width: 100%; max-width: 420px; }
+.card-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 6px; }
+.card-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 28px; }
+.form-group { margin-bottom: 18px; }
+label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 7px; color: #c8d8ef; }
+input[type=text], input[type=email], input[type=password] {
+  width: 100%; background: rgba(255,255,255,0.05); border: 1.5px solid var(--border);
+  color: var(--text); border-radius: 8px; padding: 12px 14px; font-size: 0.95rem;
+  font-family: var(--font); outline: none; transition: border-color 0.2s;
+}
+input:focus { border-color: var(--primary); }
+.row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; }
+.checkbox-row input { width: auto; accent-color: var(--primary); }
+.link { color: var(--primary); text-decoration: none; font-size: 0.85rem; }
+.link:hover { text-decoration: underline; }
+.btn { width: 100%; background: var(--primary); color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 1rem; font-weight: 600; cursor: pointer; font-family: var(--font); transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn:hover { background: #1976D2; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.error-msg { background: rgba(239,83,80,0.1); border: 1px solid rgba(239,83,80,0.3); color: var(--danger); border-radius: 8px; padding: 12px; font-size: 0.85rem; margin-bottom: 18px; display: none; }
+.divider { text-align: center; color: var(--text-muted); font-size: 0.82rem; margin: 22px 0; position: relative; }
+.divider::before, .divider::after { content:''; position:absolute; top:50%; width:42%; height:1px; background:var(--border); }
+.divider::before { left:0; } .divider::after { right:0; }
+.register-link { text-align: center; margin-top: 22px; font-size: 0.88rem; color: var(--text-muted); }
+.disclaimer { max-width: 420px; text-align: center; margin-top: 28px; font-size: 0.74rem; color: var(--text-muted); line-height: 1.5; }
+.spinner { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="brand">
+  <div class="brand-icon">
+    <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+      <path d="M8 20 Q12 10 16 20 Q20 30 24 20 Q28 10 32 20" stroke="#2196F3" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="20" cy="20" r="4" fill="#00BCD4"/>
+    </svg>
+  </div>
+  <h1>VoicePath AI</h1>
+  <p>Voice-Based Disease Detection System</p>
+</div>
+
+<div class="card">
+  <h2 class="card-title">Welcome back</h2>
+  <p class="card-sub">Sign in to access your patient dashboard</p>
+
+  <div class="error-msg" id="error-msg"></div>
+
+  <form id="login-form" onsubmit="handleLogin(event)">
+    <div class="form-group">
+      <label for="identifier">Email or Username</label>
+      <input type="text" id="identifier" placeholder="Enter email or username" required autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
+    </div>
+    <div class="row">
+      <label class="checkbox-row">
+        <input type="checkbox" id="remember"> Remember me
+      </label>
+      <a href="#" class="link" onclick="alert('Please contact your healthcare provider to reset your password.'); return false;">Forgot password?</a>
+    </div>
+    <button type="submit" class="btn" id="login-btn">
+      <span id="btn-text">Sign In</span>
+      <div class="spinner" id="spinner" style="display:none"></div>
+    </button>
+  </form>
+
+  <div class="divider">or</div>
+  <div class="register-link">
+    Don't have an account? <a href="register.html" class="link">Create account</a>
+  </div>
+</div>
+
+<p class="disclaimer">
+  VoicePath AI is an experimental research prototype. Results are not medical diagnoses.
+  Always consult a qualified healthcare professional.
+</p>
+
+<script>
+async function handleLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('login-btn');
+  const spinner = document.getElementById('spinner');
+  const btnText = document.getElementById('btn-text');
+  const errEl = document.getElementById('error-msg');
+  errEl.style.display = 'none';
+  btn.disabled = true; spinner.style.display = 'block'; btnText.textContent = 'Signing in...';
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({
+        email: document.getElementById('identifier').value.trim(),
+        password: document.getElementById('password').value,
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) { showError(data.error || 'Login failed'); return; }
+    localStorage.setItem('vp_user', JSON.stringify(data.user));
+    localStorage.setItem('vp_patient', JSON.stringify(data.patient));
+    const next = new URLSearchParams(window.location.search).get('next') || '/';
+    window.location.href = next;
+  } catch(err) {
+    showError('Network error: ' + err.message);
+  } finally {
+    btn.disabled = false; spinner.style.display = 'none'; btnText.textContent = 'Sign In';
+  }
+}
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg; el.style.display = 'block';
+}
+// Auto-redirect if already logged in
+fetch('/api/auth/me', {credentials:'include'}).then(r => {
+  if (r.ok) {
+    const next = new URLSearchParams(window.location.search).get('next') || '/';
+    window.location.href = next;
+  }
+});
+</script>
+</body>
+</html>

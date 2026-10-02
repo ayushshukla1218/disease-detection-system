@@ -1,0 +1,62 @@
+{
+  "disease": "respiratory",
+  "best_model": "GradientBoosting",
+  "best_result": {
+    "accuracy": 0.8959,
+    "precision": 0.9022,
+    "recall": 0.8465,
+    "specificity": 0.8985,
+    "f1": 0.8957,
+    "auc": 0.9241
+  },
+  "all_models": {
+    "RandomForest": {
+      "accuracy": 0.8567,
+      "precision": 0.8752,
+      "recall": 0.85,
+      "specificity": 0.8815,
+      "f1": 0.8544,
+      "auc": 0.9076
+    },
+    "SVM": {
+      "accuracy": 0.8164,
+      "precision": 0.8258,
+      "recall": 0.8102,
+      "specificity": 0.8416,
+      "f1": 0.8138,
+      "auc": 0.8444
+    },
+    "LogisticRegression": {
+      "accuracy": 0.6886,
+      "precision": 0.725,
+      "recall": 0.6955,
+      "specificity": 0.7313,
+      "f1": 0.6464,
+      "auc": 0.7385
+    },
+    "GradientBoosting": {
+      "accuracy": 0.8959,
+      "precision": 0.9022,
+      "recall": 0.8465,
+      "specificity": 0.8985,
+      "f1": 0.8957,
+      "auc": 0.9241
+    }
+  },
+  "n_samples": 50,
+  "n_disease": 25,
+  "n_healthy": 25,
+  "top_features": {
+    "mfcc_2_mean": 0.2117,
+    "spectral_centroid_std": 0.1407,
+    "mfcc_1_mean": 0.1308,
+    "mfcc_5_std": 0.0966,
+    "spectral_centroid_mean": 0.0785,
+    "mfcc_4_std": 0.0474,
+    "spectral_rolloff_std": 0.0432,
+    "mfcc_10_std": 0.037,
+    "spectral_rolloff_mean": 0.0354,
+    "mfcc_13_std": 0.0318
+  },
+  "cv_folds": 5
+}

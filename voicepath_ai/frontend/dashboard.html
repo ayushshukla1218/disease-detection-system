@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Dashboard — VoicePath AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a1628; --bg-card: #0f1f3d; --bg-card2: #132240; --sidebar: #080f20;
+  --primary: #2196F3; --secondary: #00BCD4; --accent: #64B5F6;
+  --success: #66BB6A; --warning: #FFB74D; --danger: #ef5350;
+  --text: #e8edf5; --text-muted: #8a9bb5; --border: rgba(255,255,255,0.08);
+  --font: 'Inter', system-ui, sans-serif; --mono: 'JetBrains Mono', monospace;
+}
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+/* TOP NAV */
+.topnav { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(8,15,32,0.98); border-bottom: 1px solid var(--border); z-index: 100; display: flex; align-items: center; padding: 0 24px; gap: 20px; }
+.topnav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.topnav-logo h1 { font-size: 1.15rem; font-weight: 700; color: #fff; }
+.topnav-logo span { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
+.topnav-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+.user-pill { display: flex; align-items: center; gap: 10px; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 24px; padding: 6px 16px 6px 8px; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; color: #fff; flex-shrink: 0; }
+.user-pill-name { font-size: 0.88rem; font-weight: 500; }
+.btn-logout { background: none; border: 1.5px solid var(--border); color: var(--text-muted); border-radius: 8px; padding: 8px 14px; font-size: 0.82rem; cursor: pointer; font-family: var(--font); transition: all 0.2s; }
+.btn-logout:hover { border-color: var(--danger); color: var(--danger); }
+/* LAYOUT */
+.layout { display: flex; min-height: 100vh; padding-top: 64px; }
+/* SIDEBAR */
+.sidebar { width: 220px; background: var(--sidebar); border-right: 1px solid var(--border); padding: 24px 0; flex-shrink: 0; position: fixed; top: 64px; bottom: 0; overflow-y: auto; }
+.nav-section { padding: 0 12px; margin-bottom: 6px; }
+.nav-section-label { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; padding: 0 12px 8px; margin-top: 12px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--text-muted); font-size: 0.88rem; font-weight: 500; transition: all 0.2s; margin-bottom: 2px; }
+.nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+.nav-item.active { background: rgba(33,150,243,0.12); color: var(--primary); border-left: 2px solid var(--primary); }
+.nav-icon { width: 18px; text-align: center; font-size: 1rem; }
+/* MAIN */
+.main { flex: 1; margin-left: 220px; padding: 32px; min-height: calc(100vh - 64px); }
+/* TABS */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+/* PAGE HEADER */
+.page-header { margin-bottom: 28px; }
+.page-header h2 { font-size: 1.5rem; font-weight: 700; color: #fff; }
+.page-header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
+/* CARDS */
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+.card-sm { padding: 18px 20px; }
+.card-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 16px; color: #fff; display: flex; align-items: center; gap: 8px; }
+/* STAT GRID */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.stat-card-label { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 8px; }
+.stat-card-val { font-size: 1.7rem; font-weight: 700; font-family: var(--mono); }
+.stat-card-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+/* HEALTH CONDITION CARDS */
+.conditions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 24px; }
+.cond-card { border-radius: 12px; padding: 18px; border: 1px solid; }
+.cond-card.yes { background: rgba(239,83,80,0.07); border-color: rgba(239,83,80,0.25); }
+.cond-card.no  { background: rgba(76,175,80,0.06); border-color: rgba(76,175,80,0.2); }
+.cond-card.unknown { background: rgba(255,255,255,0.03); border-color: var(--border); }
+.cond-icon { font-size: 1.5rem; margin-bottom: 8px; }
+.cond-name { font-size: 0.88rem; font-weight: 600; margin-bottom: 4px; }
+.cond-status { font-size: 0.78rem; }
+.cond-card.yes .cond-status { color: var(--danger); }
+.cond-card.no  .cond-status { color: var(--success); }
+.cond-card.unknown .cond-status { color: var(--text-muted); }
+/* HISTORY TABLE */
+.history-table { width: 100%; border-collapse: collapse; }
+.history-table th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600; padding: 10px 16px; border-bottom: 1px solid var(--border); text-align: left; }
+.history-table td { padding: 13px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.88rem; }
+.history-table tr:hover td { background: rgba(33,150,243,0.03); }
+.badge { display: inline-block; border-radius: 6px; padding: 3px 10px; font-size: 0.75rem; font-weight: 600; }
+.badge-disease { background: rgba(239,83,80,0.12); color: #ef5350; border: 1px solid rgba(239,83,80,0.2); }
+.badge-healthy { background: rgba(76,175,80,0.12); color: #66BB6A; border: 1px solid rgba(76,175,80,0.2); }
+.badge-uncertain { background: rgba(255,152,0,0.12); color: #FFB74D; border: 1px solid rgba(255,152,0,0.2); }
+.badge-model { background: rgba(33,150,243,0.1); color: var(--accent); border: 1px solid rgba(33,150,243,0.2); }
+.empty-state { text-align: center; padding: 48px; color: var(--text-muted); }
+.empty-state .empty-icon { font-size: 3rem; margin-bottom: 14px; }
+.empty-state p { font-size: 0.9rem; }
+/* PROFILE FORM */
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.form-group { margin-bottom: 0; }
+.form-group label { display: block; font-size: 0.82rem; font-weight: 500; color: #c8d8ef; margin-bottom: 6px; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; background: rgba(255,255,255,0.05); border: 1.5px solid var(--border);
+  color: var(--text); border-radius: 8px; padding: 11px 14px; font-size: 0.9rem;
+  font-family: var(--font); outline: none; transition: border-color 0.2s;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+.form-group select option { background: #0f1f3d; }
+.form-group textarea { resize: vertical; min-height: 80px; }
+.form-full { grid-column: 1 / -1; }
+.btn-save { background: var(--primary); color: #fff; border: none; border-radius: 8px; padding: 12px 28px; font-size: 0.95rem; font-weight: 600; cursor: pointer; font-family: var(--font); transition: background 0.2s; display: flex; align-items: center; gap: 8px; }
+.btn-save:hover { background: #1976D2; }
+.save-success { background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.25); color: var(--success); border-radius: 8px; padding: 12px; font-size: 0.85rem; margin-top: 16px; display: none; }
+.section-divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+.toggle-check { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; cursor: pointer; }
+.toggle-check input { width: 16px; height: 16px; accent-color: var(--primary); }
+.conditions-check-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+/* SETTINGS */
+.setting-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.setting-label { font-size: 0.9rem; font-weight: 500; }
+.setting-val { font-size: 0.85rem; color: var(--text-muted); font-family: var(--mono); }
+.coming-soon { font-size: 0.78rem; background: rgba(255,152,0,0.1); color: var(--warning); border: 1px solid rgba(255,152,0,0.2); border-radius: 6px; padding: 3px 10px; }
+/* RESPONSIVE */
+@media(max-width:900px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; padding: 20px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .conditions-grid { grid-template-columns: 1fr; }
+  .profile-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a class="topnav-logo" href="/">
+    <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+      <path d="M8 20 Q12 10 16 20 Q20 30 24 20 Q28 10 32 20" stroke="#2196F3" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="20" cy="20" r="4" fill="#00BCD4"/>
+    </svg>
+    <div><h1>VoicePath AI</h1></div>
+  </a>
+  <div class="topnav-right">
+    <div class="user-pill">
+      <div class="avatar" id="nav-avatar">?</div>
+      <span class="user-pill-name" id="nav-username">Loading...</span>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+  </div>
+</nav>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section-label">Main</div>
+    <div class="nav-section">
+      <div class="nav-item active" onclick="showTab('overview', this)">
+        <span class="nav-icon">&#127968;</span> Overview
+      </div>
+      <div class="nav-item" onclick="showTab('profile', this)">
+        <span class="nav-icon">&#128100;</span> Medical Profile
+      </div>
+      <div class="nav-item" onclick="showTab('history', this)">
+        <span class="nav-icon">&#128203;</span> Voice Analysis History
+      </div>
+    </div>
+    <div class="nav-section-label">Account</div>
+    <div class="nav-section">
+      <div class="nav-item" onclick="showTab('settings', this)">
+        <span class="nav-icon">&#9881;</span> Settings
+      </div>
+      <div class="nav-item" onclick="window.location.href='/'">
+        <span class="nav-icon">&#128300;</span> Run Analysis
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- OVERVIEW TAB -->
+    <div class="tab-content active" id="tab-overview">
+      <div class="page-header">
+        <h2 id="welcome-title">Welcome back</h2>
+        <p>Your health overview and recent voice analysis results</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-label">Total Analyses</div>
+          <div class="stat-card-val" id="stat-total" style="color:var(--primary)">&#8212;</div>
+          <div class="stat-card-sub">voice recordings analyzed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Last Analysis</div>
+          <div class="stat-card-val" id="stat-last" style="color:var(--secondary);font-size:1.1rem">&#8212;</div>
+          <div class="stat-card-sub">most recent</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Age</div>
+          <div class="stat-card-val" id="stat-age" style="color:var(--accent)">&#8212;</div>
+          <div class="stat-card-sub">years old</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Health Conditions</div>
+          <div class="stat-card-val" id="stat-conditions" style="color:var(--warning)">&#8212;</div>
+          <div class="stat-card-sub">reported conditions</div>
+        </div>
+      </div>
+
+      <!-- Health Conditions -->
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-title">&#127973; Health Conditions Summary</div>
+        <div class="conditions-grid" id="conditions-grid">
+          <!-- populated by JS -->
+        </div>
+      </div>
+
+      <!-- Recent analyses -->
+      <div class="card">
+        <div class="card-title">&#127897; Recent Voice Analyses</div>
+        <div id="recent-analyses-wrap">
+          <div class="empty-state">
+            <div class="empty-icon">&#127897;</div>
+            <p>No analyses yet.<br><a href="/" style="color:var(--primary)">Run your first voice analysis &#8594;</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE TAB -->
+    <div class="tab-content" id="tab-profile">
+      <div class="page-header">
+        <h2>Medical Profile</h2>
+        <p>Update your personal and medical information</p>
+      </div>
+      <div class="card">
+        <div class="card-title">&#128100; Personal Information</div>
+        <div class="profile-grid" id="profile-form">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" id="pf-name" placeholder="Full name">
+          </div>
+          <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="pf-age" placeholder="Age" min="1" max="120">
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="pf-gender">
+              <option value="">Select</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+              <option value="Prefer not to say">Prefer not to say</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Date of Birth</label>
+            <input type="date" id="pf-dob">
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="text" id="pf-phone" placeholder="+1 234 567 8900">
+          </div>
+          <div class="form-group">
+            <label>Address</label>
+            <input type="text" id="pf-address" placeholder="City, Country">
+          </div>
+        </div>
+
+        <hr class="section-divider">
+        <div class="card-title">&#129658; Medical Conditions</div>
+        <div class="conditions-check-grid" style="margin-bottom:18px">
+          <label class="toggle-check"><input type="checkbox" id="pf-diabetes"> Diabetes</label>
+          <label class="toggle-check"><input type="checkbox" id="pf-hypertension"> Hypertension</label>
+          <label class="toggle-check"><input type="checkbox" id="pf-asthma"> Asthma</label>
+          <label class="toggle-check"><input type="checkbox" id="pf-heart"> Heart Disease</label>
+          <label class="toggle-check"><input type="checkbox" id="pf-smoker"> Smoker</label>
+          <label class="toggle-check"><input type="checkbox" id="pf-alcohol"> Alcohol Use</label>
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>Diabetes Type</label>
+          <select id="pf-diabetes-type">
+            <option value="">None / Not applicable</option>
+            <option value="Type 1">Type 1</option>
+            <option value="Type 2">Type 2</option>
+            <option value="Pre-diabetic">Pre-diabetic</option>
+            <option value="Gestational">Gestational</option>
+          </select>
+        </div>
+
+        <hr class="section-divider">
+        <div class="card-title">&#128138; Medical Notes</div>
+        <div class="profile-grid">
+          <div class="form-group form-full">
+            <label>Current Medications</label>
+            <textarea id="pf-medications" placeholder="List current medications..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Known Allergies</label>
+            <input type="text" id="pf-allergies" placeholder="e.g. Penicillin">
+          </div>
+          <div class="form-group">
+            <label>Family Medical History</label>
+            <input type="text" id="pf-family" placeholder="Relevant family history">
+          </div>
+          <div class="form-group form-full">
+            <label>Additional Notes</label>
+            <textarea id="pf-notes" placeholder="Any other medical notes..."></textarea>
+          </div>
+        </div>
+
+        <div style="margin-top:24px">
+          <button class="btn-save" onclick="saveProfile()">
+            <span id="save-btn-text">Save Changes</span>
+          </button>
+          <div class="save-success" id="save-success">&#10003; Profile updated successfully</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY TAB -->
+    <div class="tab-content" id="tab-history">
+      <div class="page-header">
+        <h2>Voice Analysis History</h2>
+        <p>All your past voice recordings and their classification results</p>
+      </div>
+      <div class="card">
+        <div class="card-title">&#128203; Analysis History</div>
+        <div id="history-wrap">
+          <div class="empty-state"><div class="empty-icon">&#128203;</div><p>Loading...</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div class="tab-content" id="tab-settings">
+      <div class="page-header">
+        <h2>Settings</h2>
+        <p>Manage your account settings</p>
+      </div>
+      <div class="card" style="max-width:560px">
+        <div class="card-title">&#128272; Account Information</div>
+        <div class="setting-row">
+          <span class="setting-label">Username</span>
+          <span class="setting-val" id="set-username">&#8212;</span>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Email</span>
+          <span class="setting-val" id="set-email">&#8212;</span>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Account Role</span>
+          <span class="setting-val" id="set-role">&#8212;</span>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Member Since</span>
+          <span class="setting-val" id="set-created">&#8212;</span>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Change Password</span>
+          <span class="coming-soon">Coming Soon</span>
+        </div>
+        <div style="margin-top:24px">
+          <button class="btn-save" style="background:var(--danger)" onclick="doLogout()">Sign Out</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+let currentUser = null, currentPatient = null;
+const DISEASE_NAMES = {
+  parkinsons:"Parkinson's Disease", respiratory:"Respiratory Disease",
+  alzheimers:"Alzheimer's Disease", als:"ALS", depression:"Depression"
+};
+
+// Auth guard + init
+async function init() {
+  try {
+    const res = await fetch('/api/auth/me', { credentials: 'include' });
+    if (!res.ok) { window.location.href = '/login.html'; return; }
+    const data = await res.json();
+    currentUser = data.user;
+    currentPatient = data.patient;
+    renderUserInfo();
+    renderOverview();
+    loadHistory();
+    populateProfileForm();
+    populateSettings();
+  } catch(e) {
+    window.location.href = '/login.html';
+  }
+}
+
+function renderUserInfo() {
+  const name = currentPatient?.full_name || currentUser?.username || '?';
+  const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('nav-avatar').textContent = initials;
+  document.getElementById('nav-username').textContent = name;
+  document.getElementById('welcome-title').textContent = 'Welcome back, ' + (name.split(' ')[0] || name);
+}
+
+function renderOverview() {
+  const p = currentPatient || {};
+  document.getElementById('stat-age').textContent = p.age || '—';
+
+  const conditions = [
+    p.has_diabetes, p.has_hypertension, p.has_asthma, p.has_heart_disease
+  ].filter(Boolean).length;
+  document.getElementById('stat-conditions').textContent = conditions;
+
+  const condData = [
+    { key:'has_diabetes',     label:'Diabetes',     type: p.diabetes_type || '', icon:'🩸' },
+    { key:'has_hypertension', label:'Hypertension',  type:'High Blood Pressure', icon:'❤️' },
+    { key:'has_asthma',       label:'Asthma',        type:'Respiratory Condition', icon:'\ud83fac1' },
+    { key:'has_heart_disease',label:'Heart Disease', type:'Cardiovascular', icon:'💗' },
+  ];
+  const grid = document.getElementById('conditions-grid');
+  grid.innerHTML = '';
+  condData.forEach(c => {
+    const state = p[c.key] === true ? 'yes' : p[c.key] === false ? 'no' : 'unknown';
+    const statusText = state === 'yes' ? ('Confirmed' + (c.type ? ' — ' + c.type : ''))
+                     : state === 'no'  ? 'Not reported'
+                     : 'Not specified';
+    grid.innerHTML += `
+      <div class="cond-card ${state}">
+        <div class="cond-icon">${c.icon}</div>
+        <div class="cond-name">${c.label}</div>
+        <div class="cond-status">${statusText}</div>
+      </div>`;
+  });
+}
+
+async function loadHistory() {
+  try {
+    const res = await fetch('/api/history', { credentials: 'include' });
+    if (!res.ok) return;
+    const data = await res.json();
+    const results = data.history || [];
+
+    document.getElementById('stat-total').textContent = results.length;
+    if (results.length > 0) {
+      const last = new Date(results[0].created_at);
+      document.getElementById('stat-last').textContent =
+        last.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+    }
+
+    renderHistoryTable(results, 'recent-analyses-wrap', 5);
+    renderHistoryTable(results, 'history-wrap', null);
+  } catch(e) {
+    console.error('History load failed:', e);
+  }
+}
+
+function renderHistoryTable(results, containerId, limit) {
+  const wrap = document.getElementById(containerId);
+  const rows = limit ? results.slice(0, limit) : results;
+  if (!rows.length) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">&#127897;</div>
+      <p>No voice analyses yet.<br><a href="/" style="color:var(--primary)">Run your first analysis &#8594;</a></p></div>`;
+    return;
+  }
+  let html = `<table class="history-table"><thead><tr>
+    <th>Date</th><th>Disease</th><th>Result</th><th>Confidence</th><th>Status</th>
+  </tr></thead><tbody>`;
+  rows.forEach(r => {
+    const date = new Date(r.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'});
+    const time = new Date(r.created_at).toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
+    const isDisease = r.label === 1;
+    const badgeClass = r.uncertain ? 'badge-uncertain' : (isDisease ? 'badge-disease' : 'badge-healthy');
+    html += `<tr>
+      <td style="color:var(--text-muted)">${date} <span style="font-size:0.75rem">${time}</span></td>
+      <td>${DISEASE_NAMES[r.disease] || r.disease}</td>
+      <td><span class="badge ${badgeClass}">${r.label_name || '—'}</span></td>
+      <td style="font-family:var(--mono)">${r.confidence != null ? r.confidence + '%' : '—'}</td>
+      <td>${r.uncertain ? '<span class="badge badge-uncertain">&#9888; Low confidence</span>' : '<span style="color:var(--success);font-size:0.8rem">&#10003;</span>'}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  if (limit && results.length > limit) {
+    html += `<div style="text-align:center;margin-top:14px"><span style="font-size:0.82rem;color:var(--text-muted)">Showing ${limit} of ${results.length}.</span> <span style="color:var(--primary);cursor:pointer;font-size:0.82rem" onclick="showTab('history',null)">View all &#8594;</span></div>`;
+  }
+  wrap.innerHTML = html;
+}
+
+function populateProfileForm() {
+  const p = currentPatient || {};
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  set('pf-name', p.full_name); set('pf-age', p.age); set('pf-gender', p.gender);
+  set('pf-dob', p.date_of_birth); set('pf-phone', p.phone); set('pf-address', p.address);
+  set('pf-diabetes-type', p.diabetes_type);
+  set('pf-medications', p.current_medications); set('pf-allergies', p.allergies);
+  set('pf-family', p.family_history); set('pf-notes', p.notes);
+  const setCheck = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
+  setCheck('pf-diabetes', p.has_diabetes); setCheck('pf-hypertension', p.has_hypertension);
+  setCheck('pf-asthma', p.has_asthma); setCheck('pf-heart', p.has_heart_disease);
+  setCheck('pf-smoker', p.smoker); setCheck('pf-alcohol', p.alcohol_use);
+}
+
+async function saveProfile() {
+  const btn = document.getElementById('save-btn-text');
+  btn.textContent = 'Saving...';
+  const payload = {
+    full_name:        document.getElementById('pf-name').value.trim(),
+    age:              parseInt(document.getElementById('pf-age').value) || null,
+    gender:           document.getElementById('pf-gender').value,
+    date_of_birth:    document.getElementById('pf-dob').value,
+    phone:            document.getElementById('pf-phone').value.trim(),
+    address:          document.getElementById('pf-address').value.trim(),
+    has_diabetes:     document.getElementById('pf-diabetes').checked,
+    diabetes_type:    document.getElementById('pf-diabetes-type').value,
+    has_hypertension: document.getElementById('pf-hypertension').checked,
+    has_asthma:       document.getElementById('pf-asthma').checked,
+    has_heart_disease:document.getElementById('pf-heart').checked,
+    smoker:           document.getElementById('pf-smoker').checked,
+    alcohol_use:      document.getElementById('pf-alcohol').checked,
+    current_medications: document.getElementById('pf-medications').value.trim(),
+    allergies:        document.getElementById('pf-allergies').value.trim(),
+    family_history:   document.getElementById('pf-family').value.trim(),
+    notes:            document.getElementById('pf-notes').value.trim(),
+  };
+  try {
+    const res = await fetch('/api/auth/update-profile', {
+      method: 'PUT', headers: {'Content-Type':'application/json'},
+      credentials: 'include', body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (res.ok) {
+      currentPatient = data.patient;
+      localStorage.setItem('vp_patient', JSON.stringify(data.patient));
+      renderOverview(); renderUserInfo();
+      const succ = document.getElementById('save-success');
+      succ.style.display = 'block';
+      setTimeout(() => succ.style.display = 'none', 3000);
+    } else {
+      alert('Save failed: ' + (data.error || 'Unknown error'));
+    }
+  } catch(e) {
+    alert('Network error: ' + e.message);
+  } finally {
+    btn.textContent = 'Save Changes';
+  }
+}
+
+function populateSettings() {
+  const u = currentUser || {};
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+  set('set-username', u.username);
+  set('set-email', u.email);
+  set('set-role', u.role ? u.role.charAt(0).toUpperCase() + u.role.slice(1) : '—');
+  set('set-created', u.created_at ? new Date(u.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) : '—');
+}
+
+function showTab(tabName, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + tabName).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+async function doLogout() {
+  await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+  localStorage.removeItem('vp_user');
+  localStorage.removeItem('vp_patient');
+  window.location.href = '/login.html';
+}
+
+init();
+</script>
+</body>
+</html>
