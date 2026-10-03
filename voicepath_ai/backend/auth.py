@@ -37,25 +37,40 @@ def register():
     if User.query.filter_by(username=username).first():
         return jsonify({'error': 'Username already taken'}), 409
 
-    user = User(email=email, username=username)
-    user.set_password(password)
-    db.session.add(user)
-    db.session.flush()   # get user.id
+    try:
+        user = User(email=email, username=username)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.flush()
 
-    patient = Patient(
-        user_id=user.id,
-        full_name=full_name,
-        age=int(age) if age else None,
-        gender=gender,
-        has_diabetes=data.get('has_diabetes', False),
-        diabetes_type=data.get('diabetes_type', ''),
-        has_hypertension=data.get('has_hypertension', False),
-        has_asthma=data.get('has_asthma', False),
-    )
-    db.session.add(patient)
-    db.session.commit()
+        patient = Patient(
+            user_id=user.id,
+            full_name=full_name,
+            age=int(age) if age else None,
+            gender=gender,
+            dob=data.get('dob', ''),
+            phone=data.get('phone', ''),
+            address=data.get('address', ''),
+            has_diabetes=bool(data.get('has_diabetes', False)),
+            diabetes_type=data.get('diabetes_type', ''),
+            has_hypertension=bool(data.get('has_hypertension', False)),
+            has_asthma=bool(data.get('has_asthma', False)),
+            has_heart_disease=bool(data.get('has_heart_disease', False)),
+            smoker=bool(data.get('smoker', False)),
+            alcohol_use=bool(data.get('alcohol_use', False)),
+            current_medications=data.get('current_medications', ''),
+            allergies=data.get('allergies', ''),
+            family_history=data.get('family_history', ''),
+            notes=data.get('notes', ''),
+        )
+        db.session.add(patient)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Registration failed: {str(e)}'}), 500
 
     session['user_id'] = user.id
+    session.permanent = True
     return jsonify({'message': 'Registration successful', 'user': user.to_dict(),
                     'patient': patient.to_dict()}), 201
 
